@@ -852,18 +852,18 @@ http://localhost:3000/obras
 Entrar em uma obra e testar:
 
 ```text
-[ ] Aba Levantamento abre
-[ ] Criar levantamento tipo parede funciona
-[ ] Criar levantamento tipo piso funciona
-[ ] Criar levantamento tipo item unitário funciona
-[ ] Criar levantamento tipo valor manual funciona
-[ ] Criar levantamento tipo comprimento linear funciona
-[ ] Editar levantamento funciona
-[ ] Duplicar levantamento funciona
-[ ] Excluir levantamento funciona
-[ ] Cálculos aparecem na tabela
-[ ] Item com erro aparece destacado
-[ ] Recarregar página preserva levantamentos
+[X] Aba Levantamento abre
+[X] Criar levantamento tipo parede funciona
+[X] Criar levantamento tipo piso funciona
+[X] Criar levantamento tipo item unitário funciona
+[X] Criar levantamento tipo valor manual funciona
+[X] Criar levantamento tipo comprimento linear funciona
+[X] Editar levantamento funciona
+[X] Duplicar levantamento funciona
+[X] Excluir levantamento funciona
+[X] Cálculos aparecem na tabela
+[X] Item com erro aparece destacado
+[X] Recarregar página preserva levantamentos
 ```
 
 ### Massa de teste sugerida

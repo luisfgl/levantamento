@@ -9,6 +9,7 @@ import { AmbienteForm } from '@/components/ambientes/AmbienteForm'
 import { AmbientesTable } from '@/components/ambientes/AmbientesTable'
 import { LevantamentoForm } from '@/components/levantamento/LevantamentoForm'
 import { LevantamentosTable } from '@/components/levantamento/LevantamentosTable'
+import { VaosModal } from '@/components/levantamento/VaosModal'
 import { ServicoForm } from '@/components/servicos/ServicoForm'
 import { ServicosTable } from '@/components/servicos/ServicosTable'
 import { Card } from '@/components/ui/Card'
@@ -35,6 +36,7 @@ export default function ObraDetalhePage() {
   const [ambienteEmEdicao, setAmbienteEmEdicao] = useState<Ambiente | null>(null)
   const [servicoEmEdicao, setServicoEmEdicao] = useState<Servico | null>(null)
   const [levantamentoEmEdicao, setLevantamentoEmEdicao] = useState<LevantamentoServico | null>(null)
+  const [levantamentoComVaosAberto, setLevantamentoComVaosAberto] = useState<LevantamentoServico | null>(null)
   const [abaAtiva, setAbaAtiva] = useState('Dados da obra')
   const [carregado, setCarregado] = useState(false)
 
@@ -69,6 +71,11 @@ export default function ObraDetalhePage() {
       return resultado.erros.length === 0
     })
   }, [levantamentos, servicos])
+
+  const servicoDoLevantamentoComVaos = useMemo(() => {
+    if (!levantamentoComVaosAberto) return null
+    return servicos.find((servico) => servico.id === levantamentoComVaosAberto.servicoId) ?? null
+  }, [levantamentoComVaosAberto, servicos])
 
   function salvarAmbientesDaObra(novosAmbientesDaObra: Ambiente[]) {
     const todosAmbientes = carregarLista<Ambiente>(STORAGE_KEYS.AMBIENTES)
@@ -141,6 +148,10 @@ export default function ObraDetalhePage() {
 
     salvarLevantamentosDaObra(novaLista)
     setLevantamentoEmEdicao(null)
+
+    if (levantamentoComVaosAberto?.id === levantamento.id) {
+      setLevantamentoComVaosAberto(levantamento)
+    }
   }
 
   function handleDuplicarLevantamento(levantamento: LevantamentoServico) {
@@ -166,6 +177,10 @@ export default function ObraDetalhePage() {
 
     if (levantamentoEmEdicao?.id === levantamentoId) {
       setLevantamentoEmEdicao(null)
+    }
+
+    if (levantamentoComVaosAberto?.id === levantamentoId) {
+      setLevantamentoComVaosAberto(null)
     }
   }
 
@@ -201,6 +216,7 @@ export default function ObraDetalhePage() {
             <h1 className="mt-3 text-3xl font-bold text-slate-950">{obra.nome}</h1>
             <p className="text-slate-600">Cliente: {obra.cliente}</p>
           </div>
+
           <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
             <p className="text-xs uppercase tracking-wide text-slate-500">BDI padrão</p>
             <p className="text-xl font-semibold text-slate-950">{formatarPercentual(obra.bdiPadraoPercentual)}</p>
@@ -213,8 +229,9 @@ export default function ObraDetalhePage() {
               key={aba}
               type="button"
               onClick={() => setAbaAtiva(aba)}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${abaAtiva === aba ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'
-                }`}
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                abaAtiva === aba ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'
+              }`}
             >
               {aba}
             </button>
@@ -298,7 +315,7 @@ export default function ObraDetalhePage() {
                 {levantamentoEmEdicao ? 'Editar levantamento' : 'Novo levantamento'}
               </h2>
               <p className="mb-4 mt-1 text-sm text-slate-600">
-                Lance serviços por ambiente. Vãos entram na próxima etapa.
+                Lance serviços por ambiente. Para itens de parede, use o botão Vãos na tabela.
               </p>
               <LevantamentoForm
                 obraId={obra.id}
@@ -329,6 +346,7 @@ export default function ObraDetalhePage() {
                 onEditar={setLevantamentoEmEdicao}
                 onDuplicar={handleDuplicarLevantamento}
                 onExcluir={handleExcluirLevantamento}
+                onAbrirVaos={setLevantamentoComVaosAberto}
               />
             </Card>
           </div>
@@ -337,7 +355,7 @@ export default function ObraDetalhePage() {
         {abaAtiva === 'Resumo' ? (
           <Card>
             <h2 className="text-xl font-semibold text-slate-900">Resumo</h2>
-            <p className="mt-2 text-sm text-slate-500">Resumo visual entra após os lançamentos de levantamento.</p>
+            <p className="mt-2 text-sm text-slate-500">Resumo visual entra após vãos e descontos.</p>
           </Card>
         ) : null}
 
@@ -348,6 +366,15 @@ export default function ObraDetalhePage() {
           </Card>
         ) : null}
       </div>
+
+      {levantamentoComVaosAberto && servicoDoLevantamentoComVaos ? (
+        <VaosModal
+          levantamento={levantamentoComVaosAberto}
+          servico={servicoDoLevantamentoComVaos}
+          onFechar={() => setLevantamentoComVaosAberto(null)}
+          onSalvarLevantamento={handleSalvarLevantamento}
+        />
+      ) : null}
     </main>
   )
 }
