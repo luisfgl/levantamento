@@ -776,17 +776,17 @@ http://localhost:3000/obras
 
 Checklist manual:
 
-* [ ] Página inicial abre.
-* [ ] Botão “Acessar obras” funciona.
-* [ ] Página de obras abre.
-* [ ] Criar obra funciona.
-* [ ] Obra aparece na lista.
-* [ ] Botão “Abrir” funciona.
-* [ ] Página da obra abre.
-* [ ] Abas internas funcionam.
-* [ ] Aba Serviços mostra quantidade de serviços padrão.
-* [ ] Excluir obra funciona.
-* [ ] Recarregar página preserva obras.
+* [X] Página inicial abre.
+* [X] Botão “Acessar obras” funciona.
+* [X] Página de obras abre.
+* [X] Criar obra funciona.
+* [X] Obra aparece na lista.
+* [X] Botão “Abrir” funciona.
+* [X] Página da obra abre.
+* [X] Abas internas funcionam.
+* [X] Aba Serviços mostra quantidade de serviços padrão.
+* [X] Excluir obra funciona.
+* [X] Recarregar página preserva obras.
 
 ---
 
