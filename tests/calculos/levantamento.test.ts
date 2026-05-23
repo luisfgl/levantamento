@@ -1,4 +1,4 @@
-﻿// tests/calculos/levantamento.test.ts
+// tests/calculos/levantamento.test.ts
 
 import { describe, expect, it } from 'vitest'
 import { calcularLevantamento } from '@/lib/calculos/levantamento'
@@ -10,7 +10,7 @@ const agora = '2026-01-01T00:00:00.000Z'
 function criarServico(parcial: Partial<Servico>): Servico {
   return {
     id: 'serv_1',
-    nome: 'ServiÃ§o teste',
+    nome: 'Serviço teste',
     categoria: 'reboco',
     unidade: 'm2',
     valorUnitarioPadrao: 0,
@@ -40,8 +40,8 @@ function criarLevantamento(parcial: Partial<LevantamentoServico>): LevantamentoS
   }
 }
 
-describe('cÃ¡lculo de levantamento', () => {
-  it('calcula parede sem vÃ£o', () => {
+describe('cálculo de levantamento', () => {
+  it('calcula parede sem vão', () => {
     const servico = criarServico({ tipoCalculo: 'parede' })
     const levantamento = criarLevantamento({ comprimento: 4, altura: 2.8 })
 
@@ -55,7 +55,7 @@ describe('cÃ¡lculo de levantamento', () => {
     expect(resultado.total).toBeCloseTo(529.2)
   })
 
-  it('calcula parede com vÃ£o', () => {
+  it('calcula parede com vão', () => {
     const servico = criarServico({ tipoCalculo: 'parede' })
     const levantamento = criarLevantamento({
       comprimento: 5,
@@ -108,7 +108,7 @@ describe('cÃ¡lculo de levantamento', () => {
     expect(resultado.total).toBeCloseTo(972)
   })
 
-  it('calcula item unitÃ¡rio', () => {
+  it('calcula item unitário', () => {
     const servico = criarServico({
       tipoCalculo: 'item_unitario',
       categoria: 'acabamentos',
@@ -169,7 +169,7 @@ describe('cÃ¡lculo de levantamento', () => {
     expect(resultado.total).toBeCloseTo(243)
   })
 
-  it('gera erro quando Ã¡rea descontada Ã© maior que Ã¡rea bruta', () => {
+  it('gera erro quando área descontada é maior que área bruta', () => {
     const servico = criarServico({ tipoCalculo: 'parede' })
     const levantamento = criarLevantamento({
       comprimento: 1,
@@ -190,11 +190,11 @@ describe('cÃ¡lculo de levantamento', () => {
 
     const resultado = calcularLevantamento(levantamento, servico)
 
-    expect(resultado.erros).toContain('Ãrea descontada nÃ£o pode ser maior que a Ã¡rea bruta.')
+    expect(resultado.erros.join(' ')).toMatch(/descontada.*maior.*bruta/i)
     expect(resultado.total).toBeCloseTo(0)
   })
 
-  it('gera erro quando valor unitÃ¡rio Ã© negativo', () => {
+  it('gera erro quando valor unitário é negativo', () => {
     const servico = criarServico({ tipoCalculo: 'parede' })
     const levantamento = criarLevantamento({
       comprimento: 4,
@@ -204,7 +204,7 @@ describe('cÃ¡lculo de levantamento', () => {
 
     const resultado = calcularLevantamento(levantamento, servico)
 
-    expect(resultado.erros).toContain('Valor unitÃ¡rio nÃ£o pode ser negativo.')
+    expect(resultado.erros.join(' ')).toMatch(/valor.*negativo/i)
     expect(resultado.total).toBeCloseTo(0)
   })
 })

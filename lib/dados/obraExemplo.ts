@@ -1,0 +1,133 @@
+// lib/dados/obraExemplo.ts
+
+import type { Ambiente } from '@/lib/tipos/ambiente'
+import type { LevantamentoServico } from '@/lib/tipos/levantamento'
+import type { Obra } from '@/lib/tipos/obra'
+
+const agora = '2026-01-01T00:00:00.000Z'
+
+export const obraExemplo: Obra = {
+  id: 'obra_exemplo_residencia_modelo',
+  nome: 'Residência Modelo',
+  cliente: 'Cliente Teste',
+  endereco: 'Rua Exemplo, 123',
+  contrato: 'Contrato teste',
+  modalidade: 'Orçamento de serviços',
+  responsavelTecnico: 'Responsável Técnico',
+  registroProfissional: 'CREA/CAU/CFT',
+  dataOrcamento: '2026-01-01',
+  bdiPadraoPercentual: 35,
+  observacoes: 'Obra exemplo para validação manual do MVP.',
+  status: 'rascunho',
+  criadoEm: agora,
+  atualizadoEm: agora,
+}
+
+export const ambientesExemplo: Ambiente[] = [
+  {
+    id: 'amb_exemplo_sala',
+    obraId: obraExemplo.id,
+    pavimento: 'Térreo',
+    nome: 'Sala',
+    descricao: 'Ambiente de teste',
+    ordem: 1,
+    criadoEm: agora,
+    atualizadoEm: agora,
+  },
+  {
+    id: 'amb_exemplo_cozinha',
+    obraId: obraExemplo.id,
+    pavimento: 'Térreo',
+    nome: 'Cozinha',
+    descricao: 'Ambiente de teste',
+    ordem: 2,
+    criadoEm: agora,
+    atualizadoEm: agora,
+  },
+  {
+    id: 'amb_exemplo_banheiro',
+    obraId: obraExemplo.id,
+    pavimento: 'Térreo',
+    nome: 'Banheiro',
+    descricao: 'Ambiente de teste',
+    ordem: 3,
+    criadoEm: agora,
+    atualizadoEm: agora,
+  },
+]
+
+export const levantamentosExemplo: LevantamentoServico[] = [
+  {
+    id: 'lev_exemplo_reboco_sala',
+    obraId: obraExemplo.id,
+    ambienteId: 'amb_exemplo_sala',
+    servicoId: 'serv_padrao_reboco_interno',
+    descricao: 'Reboco da parede principal da sala',
+    comprimento: 5,
+    altura: 2.8,
+    unidade: 'm2',
+    valorUnitario: 35,
+    bdiPercentual: 35,
+    usaBdi: true,
+    vaos: [
+      {
+        id: 'vao_exemplo_porta_sala',
+        levantamentoId: 'lev_exemplo_reboco_sala',
+        tipo: 'porta',
+        descricao: 'Porta da sala',
+        largura: 0.8,
+        altura: 2.1,
+        quantidade: 1,
+        criadoEm: agora,
+        atualizadoEm: agora,
+      },
+      {
+        id: 'vao_exemplo_janela_sala',
+        levantamentoId: 'lev_exemplo_reboco_sala',
+        tipo: 'janela',
+        descricao: 'Janela da sala',
+        largura: 1.5,
+        altura: 1.2,
+        quantidade: 1,
+        criadoEm: agora,
+        atualizadoEm: agora,
+      },
+    ],
+    observacoes: 'Exemplo com desconto de vãos.',
+    criadoEm: agora,
+    atualizadoEm: agora,
+  },
+  {
+    id: 'lev_exemplo_piso_cozinha',
+    obraId: obraExemplo.id,
+    ambienteId: 'amb_exemplo_cozinha',
+    servicoId: 'serv_padrao_piso',
+    descricao: 'Piso da cozinha',
+    comprimento: 4,
+    largura: 3,
+    unidade: 'm2',
+    valorUnitario: 60,
+    bdiPercentual: 35,
+    usaBdi: true,
+    vaos: [],
+    observacoes: 'Exemplo de piso.',
+    criadoEm: agora,
+    atualizadoEm: agora,
+  },
+  {
+    id: 'lev_exemplo_porta_banheiro',
+    obraId: obraExemplo.id,
+    ambienteId: 'amb_exemplo_banheiro',
+    servicoId: 'serv_padrao_porta',
+    descricao: 'Porta do banheiro',
+    quantidade: 1,
+    unidade: 'un',
+    valorUnitario: 250,
+    bdiPercentual: 35,
+    usaBdi: true,
+    vaos: [],
+    observacoes: 'Exemplo de item unitário.',
+    criadoEm: agora,
+    atualizadoEm: agora,
+  },
+]
