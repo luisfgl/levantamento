@@ -7,16 +7,20 @@ import { useParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { AmbienteForm } from '@/components/ambientes/AmbienteForm'
 import { AmbientesTable } from '@/components/ambientes/AmbientesTable'
+import { LevantamentoForm } from '@/components/levantamento/LevantamentoForm'
+import { LevantamentosTable } from '@/components/levantamento/LevantamentosTable'
 import { ServicoForm } from '@/components/servicos/ServicoForm'
 import { ServicosTable } from '@/components/servicos/ServicosTable'
 import { Card } from '@/components/ui/Card'
-import { STORAGE_KEYS } from '@/lib/storage/storageKeys'
+import { calcularLevantamento } from '@/lib/calculos/levantamento'
 import { carregarLista, salvarLista } from '@/lib/storage/projetoStorage'
+import { STORAGE_KEYS } from '@/lib/storage/storageKeys'
 import type { Ambiente } from '@/lib/tipos/ambiente'
 import type { LevantamentoServico } from '@/lib/tipos/levantamento'
 import type { Obra } from '@/lib/tipos/obra'
 import type { Servico } from '@/lib/tipos/servico'
 import { formatarPercentual } from '@/lib/utils/formatacao'
+import { criarId } from '@/lib/utils/id'
 
 const abas = ['Dados da obra', 'Ambientes', 'Serviços', 'Levantamento', 'Resumo', 'Exportar']
 
@@ -30,6 +34,7 @@ export default function ObraDetalhePage() {
   const [levantamentos, setLevantamentos] = useState<LevantamentoServico[]>([])
   const [ambienteEmEdicao, setAmbienteEmEdicao] = useState<Ambiente | null>(null)
   const [servicoEmEdicao, setServicoEmEdicao] = useState<Servico | null>(null)
+  const [levantamentoEmEdicao, setLevantamentoEmEdicao] = useState<LevantamentoServico | null>(null)
   const [abaAtiva, setAbaAtiva] = useState('Dados da obra')
   const [carregado, setCarregado] = useState(false)
 
@@ -54,6 +59,16 @@ export default function ObraDetalhePage() {
     if (ambientes.length === 0) return 1
     return Math.max(...ambientes.map((ambiente) => ambiente.ordem)) + 1
   }, [ambientes])
+
+  const levantamentosValidos = useMemo(() => {
+    return levantamentos.filter((levantamento) => {
+      const servico = servicos.find((item) => item.id === levantamento.servicoId)
+      if (!servico) return false
+
+      const resultado = calcularLevantamento(levantamento, servico)
+      return resultado.erros.length === 0
+    })
+  }, [levantamentos, servicos])
 
   function salvarAmbientesDaObra(novosAmbientesDaObra: Ambiente[]) {
     const todosAmbientes = carregarLista<Ambiente>(STORAGE_KEYS.AMBIENTES)
@@ -109,6 +124,51 @@ export default function ObraDetalhePage() {
     handleSalvarServico(atualizado)
   }
 
+  function salvarLevantamentosDaObra(novosLevantamentosDaObra: LevantamentoServico[]) {
+    const todosLevantamentos = carregarLista<LevantamentoServico>(STORAGE_KEYS.LEVANTAMENTOS)
+    const levantamentosDeOutrasObras = todosLevantamentos.filter((levantamento) => levantamento.obraId !== obraId)
+    const novaListaGlobal = [...levantamentosDeOutrasObras, ...novosLevantamentosDaObra]
+
+    salvarLista(STORAGE_KEYS.LEVANTAMENTOS, novaListaGlobal)
+    setLevantamentos(novosLevantamentosDaObra)
+  }
+
+  function handleSalvarLevantamento(levantamento: LevantamentoServico) {
+    const existe = levantamentos.some((item) => item.id === levantamento.id)
+    const novaLista = existe
+      ? levantamentos.map((item) => (item.id === levantamento.id ? levantamento : item))
+      : [...levantamentos, levantamento]
+
+    salvarLevantamentosDaObra(novaLista)
+    setLevantamentoEmEdicao(null)
+  }
+
+  function handleDuplicarLevantamento(levantamento: LevantamentoServico) {
+    const agora = new Date().toISOString()
+
+    const copia: LevantamentoServico = {
+      ...levantamento,
+      id: criarId('lev'),
+      descricao: levantamento.descricao ? `${levantamento.descricao} - cópia` : 'Cópia de levantamento',
+      vaos: [],
+      criadoEm: agora,
+      atualizadoEm: agora,
+    }
+
+    salvarLevantamentosDaObra([...levantamentos, copia])
+  }
+
+  function handleExcluirLevantamento(levantamentoId: string) {
+    const confirmar = window.confirm('Excluir este levantamento?')
+    if (!confirmar) return
+
+    salvarLevantamentosDaObra(levantamentos.filter((levantamento) => levantamento.id !== levantamentoId))
+
+    if (levantamentoEmEdicao?.id === levantamentoId) {
+      setLevantamentoEmEdicao(null)
+    }
+  }
+
   if (!carregado) {
     return (
       <main className="min-h-screen bg-slate-50 px-6 py-10">
@@ -153,9 +213,8 @@ export default function ObraDetalhePage() {
               key={aba}
               type="button"
               onClick={() => setAbaAtiva(aba)}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                abaAtiva === aba ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'
-              }`}
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${abaAtiva === aba ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'
+                }`}
             >
               {aba}
             </button>
@@ -233,11 +292,46 @@ export default function ObraDetalhePage() {
         ) : null}
 
         {abaAtiva === 'Levantamento' ? (
-          <Card>
-            <h2 className="text-xl font-semibold text-slate-900">Levantamento</h2>
-            <p className="mt-2 text-sm text-slate-600">Itens lançados: {levantamentos.length}</p>
-            <p className="mt-4 text-sm text-slate-500">Formulário de levantamento entra na próxima etapa.</p>
-          </Card>
+          <div className="space-y-6">
+            <Card>
+              <h2 className="text-xl font-semibold text-slate-900">
+                {levantamentoEmEdicao ? 'Editar levantamento' : 'Novo levantamento'}
+              </h2>
+              <p className="mb-4 mt-1 text-sm text-slate-600">
+                Lance serviços por ambiente. Vãos entram na próxima etapa.
+              </p>
+              <LevantamentoForm
+                obraId={obra.id}
+                bdiPadraoPercentual={obra.bdiPadraoPercentual}
+                ambientes={ambientes}
+                servicos={servicos}
+                levantamentoEmEdicao={levantamentoEmEdicao}
+                onSalvar={handleSalvarLevantamento}
+                onCancelarEdicao={() => setLevantamentoEmEdicao(null)}
+              />
+            </Card>
+
+            <Card>
+              <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-900">Levantamentos lançados</h2>
+                  <p className="text-sm text-slate-600">
+                    Total: {levantamentos.length} | Válidos: {levantamentosValidos.length} | Com erro:{' '}
+                    {levantamentos.length - levantamentosValidos.length}
+                  </p>
+                </div>
+              </div>
+
+              <LevantamentosTable
+                levantamentos={levantamentos}
+                ambientes={ambientes}
+                servicos={servicos}
+                onEditar={setLevantamentoEmEdicao}
+                onDuplicar={handleDuplicarLevantamento}
+                onExcluir={handleExcluirLevantamento}
+              />
+            </Card>
+          </div>
         ) : null}
 
         {abaAtiva === 'Resumo' ? (

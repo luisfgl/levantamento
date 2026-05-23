@@ -59,26 +59,30 @@ export function ServicoForm({ servicoEmEdicao, onSalvar, onCancelarEdicao }: Ser
   const editando = Boolean(servicoEmEdicao)
 
   useEffect(() => {
-    if (!servicoEmEdicao) {
-      setNome('')
-      setCategoria('outros')
-      setUnidade('m2')
-      setTipoCalculo('parede')
-      setValorUnitarioPadrao('0')
-      setUsaBdi(true)
-      setAtivo(true)
-      setErro(null)
-      return
-    }
+    const timeoutId = window.setTimeout(() => {
+      if (!servicoEmEdicao) {
+        setNome('')
+        setCategoria('outros')
+        setUnidade('m2')
+        setTipoCalculo('parede')
+        setValorUnitarioPadrao('0')
+        setUsaBdi(true)
+        setAtivo(true)
+        setErro(null)
+        return
+      }
 
-    setNome(servicoEmEdicao.nome)
-    setCategoria(servicoEmEdicao.categoria)
-    setUnidade(servicoEmEdicao.unidade)
-    setTipoCalculo(servicoEmEdicao.tipoCalculo)
-    setValorUnitarioPadrao(String(servicoEmEdicao.valorUnitarioPadrao))
-    setUsaBdi(servicoEmEdicao.usaBdi)
-    setAtivo(servicoEmEdicao.ativo)
-    setErro(null)
+      setNome(servicoEmEdicao.nome)
+      setCategoria(servicoEmEdicao.categoria)
+      setUnidade(servicoEmEdicao.unidade)
+      setTipoCalculo(servicoEmEdicao.tipoCalculo)
+      setValorUnitarioPadrao(String(servicoEmEdicao.valorUnitarioPadrao))
+      setUsaBdi(servicoEmEdicao.usaBdi)
+      setAtivo(servicoEmEdicao.ativo)
+      setErro(null)
+    }, 0)
+
+    return () => window.clearTimeout(timeoutId)
   }, [servicoEmEdicao])
 
   function limparFormulario() {

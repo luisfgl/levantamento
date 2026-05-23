@@ -32,18 +32,22 @@ export function AmbienteForm({
   const editando = Boolean(ambienteEmEdicao)
 
   useEffect(() => {
-    if (!ambienteEmEdicao) {
-      setPavimento('')
-      setNome('')
-      setDescricao('')
-      setErro(null)
-      return
-    }
+    const timeoutId = window.setTimeout(() => {
+      if (!ambienteEmEdicao) {
+        setPavimento('')
+        setNome('')
+        setDescricao('')
+        setErro(null)
+        return
+      }
 
-    setPavimento(ambienteEmEdicao.pavimento ?? '')
-    setNome(ambienteEmEdicao.nome)
-    setDescricao(ambienteEmEdicao.descricao ?? '')
-    setErro(null)
+      setPavimento(ambienteEmEdicao.pavimento ?? '')
+      setNome(ambienteEmEdicao.nome)
+      setDescricao(ambienteEmEdicao.descricao ?? '')
+      setErro(null)
+    }, 0)
+
+    return () => window.clearTimeout(timeoutId)
   }, [ambienteEmEdicao])
 
   function limparFormulario() {
