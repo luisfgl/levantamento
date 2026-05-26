@@ -26,6 +26,7 @@ import { ItensComErroTable } from '@/components/resumo/ItensComErroTable'
 import { ResumoCategoriasTable } from '@/components/resumo/ResumoCategoriasTable'
 import { ResumoGeralCard } from '@/components/resumo/ResumoGeralCard'
 import { calcularResumoObra } from '@/lib/calculos/resumo'
+import { ExportacaoJsonPanel } from '@/components/exportacao/ExportacaoJsonPanel'
 
 const abas = ['Dados da obra', 'Ambientes', 'Serviços', 'Levantamento', 'Resumo', 'Exportar']
 
@@ -377,10 +378,12 @@ export default function ObraDetalhePage() {
         ) : null}
 
         {abaAtiva === 'Exportar' ? (
-          <Card>
-            <h2 className="text-xl font-semibold text-slate-900">Exportar</h2>
-            <p className="mt-2 text-sm text-slate-500">Botão de exportação JSON entra em etapa própria.</p>
-          </Card>
+          <ExportacaoJsonPanel
+            obra={obra}
+            ambientes={ambientes}
+            servicos={servicos}
+            levantamentos={levantamentos}
+          />
         ) : null}
       </div>
 
