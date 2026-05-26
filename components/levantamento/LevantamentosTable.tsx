@@ -93,14 +93,14 @@ export function LevantamentosTable({
             const resultado = servico
               ? calcularLevantamento(levantamento, servico)
               : {
-                  areaBruta: 0,
-                  areaDescontada: 0,
-                  saldo: 0,
-                  subtotal: 0,
-                  valorBdi: 0,
-                  total: 0,
-                  erros: ['Serviço não encontrado.'],
-                }
+                areaBruta: 0,
+                areaDescontada: 0,
+                saldo: 0,
+                subtotal: 0,
+                valorBdi: 0,
+                total: 0,
+                erros: ['Serviço não encontrado.'],
+              }
 
             const temErro = resultado.erros.length > 0
 
@@ -123,7 +123,15 @@ export function LevantamentosTable({
                 </td>
 
                 <td className="px-4 py-3 text-right text-slate-700">
-                  {formatarNumero(resultado.areaDescontada)} m²
+                  <div className="flex flex-col items-end gap-2">
+                    <span>{formatarNumero(resultado.areaDescontada)} m²</span>
+
+                    {servico?.tipoCalculo === 'parede' ? (
+                      <Button type="button" variant="secondary" onClick={() => onAbrirVaos(levantamento)}>
+                        Vãos
+                      </Button>
+                    ) : null}
+                  </div>
                 </td>
 
                 <td className="px-4 py-3 text-right text-slate-700">
