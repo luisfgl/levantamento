@@ -22,6 +22,10 @@ import type { Obra } from '@/lib/tipos/obra'
 import type { Servico } from '@/lib/tipos/servico'
 import { formatarPercentual } from '@/lib/utils/formatacao'
 import { criarId } from '@/lib/utils/id'
+import { ItensComErroTable } from '@/components/resumo/ItensComErroTable'
+import { ResumoCategoriasTable } from '@/components/resumo/ResumoCategoriasTable'
+import { ResumoGeralCard } from '@/components/resumo/ResumoGeralCard'
+import { calcularResumoObra } from '@/lib/calculos/resumo'
 
 const abas = ['Dados da obra', 'Ambientes', 'Serviços', 'Levantamento', 'Resumo', 'Exportar']
 
@@ -76,6 +80,10 @@ export default function ObraDetalhePage() {
     if (!levantamentoComVaosAberto) return null
     return servicos.find((servico) => servico.id === levantamentoComVaosAberto.servicoId) ?? null
   }, [levantamentoComVaosAberto, servicos])
+
+  const resumoObra = useMemo(() => {
+    return calcularResumoObra(levantamentos, servicos)
+  }, [levantamentos, servicos])
 
   function salvarAmbientesDaObra(novosAmbientesDaObra: Ambiente[]) {
     const todosAmbientes = carregarLista<Ambiente>(STORAGE_KEYS.AMBIENTES)
@@ -229,9 +237,8 @@ export default function ObraDetalhePage() {
               key={aba}
               type="button"
               onClick={() => setAbaAtiva(aba)}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                abaAtiva === aba ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'
-              }`}
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${abaAtiva === aba ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'
+                }`}
             >
               {aba}
             </button>
@@ -353,10 +360,20 @@ export default function ObraDetalhePage() {
         ) : null}
 
         {abaAtiva === 'Resumo' ? (
-          <Card>
-            <h2 className="text-xl font-semibold text-slate-900">Resumo</h2>
-            <p className="mt-2 text-sm text-slate-500">Resumo visual entra após vãos e descontos.</p>
-          </Card>
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-950">Resumo da obra</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Totais calculados com base nos levantamentos válidos. Itens com erro não entram no total.
+              </p>
+            </div>
+
+            <ResumoGeralCard resumo={resumoObra} />
+
+            <ResumoCategoriasTable categorias={resumoObra.categorias} />
+
+            <ItensComErroTable levantamentos={levantamentos} ambientes={ambientes} servicos={servicos} />
+          </div>
         ) : null}
 
         {abaAtiva === 'Exportar' ? (
